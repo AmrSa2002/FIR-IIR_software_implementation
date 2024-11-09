@@ -1,5 +1,10 @@
 import pytest
-from filteri.fir_filter import design_fir_filter, frequency_response
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from filters.fir_filter import design_fir_filter, frequency_response
+
 
 def test_design_fir_filter():
     fir_coeff = design_fir_filter()

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from filteri.fir_filter import design_fir_filter, frequency_response
+from filters.fir_filter import design_fir_filter, frequency_response
 
 # Dizajn filtera
 fir_coeff = design_fir_filter()
