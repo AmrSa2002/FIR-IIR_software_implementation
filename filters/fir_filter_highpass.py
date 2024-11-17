@@ -11,14 +11,14 @@ def design_highpass_fir_filter(cutoff_freq, numtaps):
 def manual_design_highpass_fir_filter(cutoff_freq, numtaps):
     """
     Dizajnira FIR high-pass filter sa zadanim parametrima, ručno.
-    
+
     cutoff_freq: Normalizovana frekvencija odsecanja (0 do 1, gde je 1 Nyquistova frekvencija)
     numtaps: Broj koeficijenata (dužina filtera)
     """
     # Normalizovana ugaona frekvencija odsecanja
-    
-    wc = 2 * np.pi * cutoff_freq  # Normalizovana cutoff u radijanima
-    
+
+    wc = 1 * np.pi * cutoff_freq  # Normalizovana cutoff u radijanima
+
     # Srednji indeks (centar simetričnog filtra)
     M = numtaps // 2
 
@@ -29,10 +29,6 @@ def manual_design_highpass_fir_filter(cutoff_freq, numtaps):
             h[n] = 1 - wc / np.pi
         else:
             h[n] = -np.sin(wc * (n - M)) / (np.pi * (n - M))
-
-    # Primjena prozora (npr. Hammingov prozor)
-    window = np.hamming(numtaps)
-    h = h * window
-
+           # Primjena prozora (npr. Hammingov prozor)
+        h[n] *= 0.54 - 0.46 * np.cos(2 * np.pi * n / (numtaps - 1))
     return h
-
