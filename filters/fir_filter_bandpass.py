@@ -19,9 +19,9 @@ def manual_design_bandpass_fir_filter(low_cutoff, high_cutoff, numtaps):
         elif i != mid_point:
             ideal_impulse_response[i] = (np.sin(2 * np.pi * high_cutoff * (i - mid_point)) -
                                          np.sin(2 * np.pi * low_cutoff * (i - mid_point))) / (np.pi * (i - mid_point))
-    
+
     # Primjena prozora (npr. Hammingov prozor) na idealni impulzni odgovor
     window = np.hamming(numtaps)
     fir_coefficients = ideal_impulse_response * window
-    
+
     return fir_coefficients

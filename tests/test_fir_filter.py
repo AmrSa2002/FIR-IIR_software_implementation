@@ -25,7 +25,6 @@ def test_fir_coefficients_highpass():
     assert fir_coefficients_manual == pytest.approx(fir_coefficients_firwin, rel=1e-7, abs=1e-3)
 
 def test_fir_coefficients_bandpass():
-    fir_coefficients_manual = design_bandpass_fir_filter(cutoff_freq=0.3, numtaps=21)
-    fir_coefficients_firwin = manual_design_bandpass_fir_filter(cutoff_freq=0.3, numtaps=21)
+    fir_coefficients_manual = design_bandpass_fir_filter(low_cutoff=0.2, high_cutoff=0.4, numtaps=51)
+    fir_coefficients_firwin = manual_design_bandpass_fir_filter(low_cutoff=0.2, high_cutoff=0.4, numtaps=51)
     assert fir_coefficients_manual == pytest.approx(fir_coefficients_firwin, rel=1e-7, abs=1e-3)
-
