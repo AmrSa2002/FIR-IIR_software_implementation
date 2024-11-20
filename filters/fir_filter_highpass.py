@@ -2,33 +2,46 @@ import numpy as np
 from scipy import signal
 
 def design_highpass_fir_filter(cutoff_freq, numtaps):
-    """ Dizajnira FIR high-pass filter sa zadanim parametrima """
-    # Dizajniranje osnovnog low-pass filtera
-    fir_coeff = signal.firwin(numtaps, cutoff=cutoff_freq, pass_zero=False)  # pass_zero=False za high-pass
+    """
+    Designs a high-pass FIR filter using predefined parameters.
+
+    Parameters:
+        cutoff_freq (float): Normalized cutoff frequency (0 to 1, where 1 corresponds to the Nyquist frequency).
+        numtaps (int): Number of coefficients (length of the filter).
+
+    Returns:
+        numpy.ndarray: Array of FIR filter coefficients.
+    """    
+    # Design a high-pass FIR filter using the Hamming window method
+    fir_coeff = signal.firwin(numtaps, cutoff=cutoff_freq, pass_zero=False)   # pass_zero=False specifies high-pass
     return fir_coeff
 
 
 def manual_design_highpass_fir_filter(cutoff_freq, numtaps):
     """
-    Dizajnira FIR high-pass filter sa zadanim parametrima, ručno.
+    Manually designs a high-pass FIR filter using a specified cutoff frequency and number of taps.
 
-    cutoff_freq: Normalizovana frekvencija odsecanja (0 do 1, gde je 1 Nyquistova frekvencija)
-    numtaps: Broj koeficijenata (dužina filtera)
+    Parameters:
+        cutoff_freq (float): Normalized cutoff frequency (0 to 1, where 1 corresponds to the Nyquist frequency).
+        numtaps (int): Number of coefficients (length of the filter).
+
+    Returns:
+        numpy.ndarray: Array of manually computed FIR filter coefficients.
     """
-    # Normalizovana ugaona frekvencija odsecanja
+    wc = 1 * np.pi * cutoff_freq # Normalized cutoff in radians
 
-    wc = 1 * np.pi * cutoff_freq  # Normalizovana cutoff u radijanima
-
-    # Srednji indeks (centar simetričnog filtra)
+    # Calculate the middle index (center of the symmetric filter)
     M = numtaps // 2
 
-    # Idealni impulsni odziv za high-pass filter
+    # Initialize the impulse response array
     h = np.zeros(numtaps)
+
+    # Calculate the ideal impulse response for a high-pass filter
     for n in range(numtaps):
-        if n == M:  # Za srednji indeks
+        if n == M:  # Handle the middle index
             h[n] = 1 - wc / np.pi
         else:
             h[n] = -np.sin(wc * (n - M)) / (np.pi * (n - M))
-           # Primjena prozora (npr. Hammingov prozor)
+        # Apply a window function (e.g., Hamming window)
         h[n] *= 0.54 - 0.46 * np.cos(2 * np.pi * n / (numtaps - 1))
     return h
