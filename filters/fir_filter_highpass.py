@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import firwin
+from scipy.signal import freqz
 
 def sinc_function(x: float) -> float:
     """
@@ -116,15 +117,15 @@ def plot_highpass_filter_responses(cutoff_freq: float, num_taps: int, sample_rat
     h_manual = highpass_fir_filter_manual(cutoff_freq, num_taps)
     h_firwin = highpass_fir_filter_firwin(cutoff_freq, num_taps)
 
-    w_manual, h_response_manual = np.fft.fft(h_manual, 1024), np.fft.fftshift(np.abs(np.fft.fft(h_manual, 1024)))
-    w_firwin, h_response_firwin = np.fft.fft(h_firwin, 1024), np.fft.fftshift(np.abs(np.fft.fft(h_firwin, 1024)))
-    freqs = np.fft.fftfreq(len(w_manual), 1 / sample_rate)
+    w_manual, h_response_manual = freqz(h_manual, worN=8000)
+    w_firwin, h_response_firwin = freqz(h_firwin, worN=8000)
 
-    plt.plot(freqs[freqs >= 0], 20 * np.log10(h_response_manual[freqs >= 0]), label='Manual')
-    plt.plot(freqs[freqs >= 0], 20 * np.log10(h_response_firwin[freqs >= 0]), label='Firwin')
-    plt.title('Highpass Filter Frequency Response')
+    plt.figure()
+    plt.plot(0.5 * sample_rate * w_manual / np.pi, np.abs(h_response_manual), 'b', label='Manual')
+    plt.plot(0.5 * sample_rate * w_firwin / np.pi, np.abs(h_response_firwin), 'r', label='firwin')
+    plt.title("High-pass Filter Frequency Response")
     plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Magnitude (dB)')
+    plt.ylabel('Gain')
     plt.legend()
     plt.grid()
     plt.show()
