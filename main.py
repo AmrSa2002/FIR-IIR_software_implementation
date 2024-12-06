@@ -28,6 +28,11 @@ plot_filter_opt_responses(cutoff_freq_lowpass, num_taps, sample_rate)
 
 # Bandpass filter
 print("Bandpass Filter")
+plot_bandpass_filter_coefficients(lowcut_bandpass, highcut_bandpass, num_taps)
+plot_bandpass_filter_responses(lowcut_bandpass, highcut_bandpass, num_taps, sample_rate)
+
+# Bandpass filter - optimized
+print("Bandpass Filter")
 plot_bandpass_filter_opt_coefficients(lowcut_bandpass, highcut_bandpass, num_taps)
 plot_bandpass_filter_opt_responses(lowcut_bandpass, highcut_bandpass, num_taps, sample_rate)
 
