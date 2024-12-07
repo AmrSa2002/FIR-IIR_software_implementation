@@ -266,7 +266,7 @@ memory_bandpass, time_loop = track_memory_usage_bandpass(bandpass_fir_filter_man
 memory_bandpass_opt, time_optimized = track_memory_usage_bandpass(bandpass_fir_filter_opt_manual)
 
 
-# Plot memory usage comparison for Lowpass FIR
+# Plot memory usage comparison for Bandpass FIR
 plt.plot(time_loop, memory_bandpass, label="Bandpass FIR")
 plt.plot(time_optimized, memory_bandpass_opt, label="Optimized Bandpass FIR")
 plt.xlabel("Time (s)")
