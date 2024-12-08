@@ -16,7 +16,9 @@ from filters.fir_filter_highpass import (
     plot_highpass_filter_responses,
     plot_highpass_filter_coefficients,
     plot_highpass_filter_opt_coefficients,
-    plot_highpass_filter_opt_responses
+    plot_highpass_filter_opt_responses,
+    highpass_fir_filter_manual,
+    highpass_fir_filter_opt_manual
 )
 from filters.iir_filter_butterworth_lowpass import plot_frequency_response as plot_iir_lowpass_response
 from filters.iir_filter_butterworth_bandpass import plot_frequency_response as plot_iir_bandpass_response
