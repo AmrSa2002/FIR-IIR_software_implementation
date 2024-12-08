@@ -1,6 +1,10 @@
 import pytest
 import numpy as np
 from scipy.signal import lfilter, iirfilter
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from filters.iir_filter_butterworth_highpass import butterworth_hp_manual, butterworth_hp_builtin, FilterErrorHp
 from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual, butterworth_lp_builtin, FilterErrorLp
 

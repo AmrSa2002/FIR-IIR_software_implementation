@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import pytest
 import numpy as np
 from filters.fir_filter_lowpass import lowpass_fir_filter_firwin, lowpass_fir_filter_manual, FilterError as FilterErrorLp
