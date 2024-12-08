@@ -34,7 +34,7 @@ def measure_performance_highpass():
     optimized_time = timeit.timeit(
         stmt="highpass_fir_filter_opt_manual(cutoff_freq, num_taps)",
         setup=(
-            "from filters.fir_filter_highpass_opt import highpass_fir_filter_opt_manual;"
+            "from filters.fir_filter_highpass import highpass_fir_filter_opt_manual;"
             "cutoff_freq = 0.51; num_taps = 101"
         ),
         number=1000
@@ -67,7 +67,7 @@ def measure_performance_lowpass():
     optimized_time = timeit.timeit(
         stmt="lowpass_fir_filter_opt_manual(cutoff_freq, num_taps)",
         setup=(
-            "from filters.fir_filter_lowpass_opt import lowpass_fir_filter_opt_manual;"
+            "from filters.fir_filter_lowpass import lowpass_fir_filter_opt_manual;"
             "cutoff_freq = 0.51; num_taps = 101"
         ),
         number=1000
@@ -102,7 +102,7 @@ def measure_performance_bandpass():
     optimized_time = timeit.timeit(
         stmt="bandpass_fir_filter_opt_manual(lowcut_bandpass, highcut_bandpass, num_taps)",
         setup=(
-            "from filters.fir_filter_bandpass_opt import bandpass_fir_filter_opt_manual;"
+            "from filters.fir_filter_bandpass import bandpass_fir_filter_opt_manual;"
             "lowcut_bandpass = 0.2; highcut_bandpass = 0.4; num_taps = 101"
         ),
         number=1000
