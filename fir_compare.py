@@ -2,11 +2,11 @@ import timeit
 import numpy as np
 import matplotlib.pyplot as plt
 from filters.fir_filter_highpass import highpass_fir_filter_manual
-from filters.fir_filter_highpass_opt import highpass_fir_filter_opt_manual
+from filters.fir_filter_highpass import highpass_fir_filter_opt_manual
 from filters.fir_filter_lowpass import lowpass_fir_filter_manual
-from filters.fir_filter_lowpass_opt import lowpass_fir_filter_opt_manual
+from filters.fir_filter_lowpass import lowpass_fir_filter_opt_manual
 from filters.fir_filter_bandpass import bandpass_fir_filter_manual
-from filters.fir_filter_bandpass_opt import bandpass_fir_filter_opt_manual
+from filters.fir_filter_bandpass import bandpass_fir_filter_opt_manual
 from memory_profiler import profile
 import time
 import psutil
@@ -275,4 +275,3 @@ plt.title("Memory Usage Comparison")
 plt.legend()
 plt.grid(True)
 plt.show()
-

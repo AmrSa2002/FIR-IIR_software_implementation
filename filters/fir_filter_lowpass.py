@@ -2,6 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import firwin
 
+class FilterError(Exception):
+    """Custom exception for filter errors."""
+    pass
+
+def validate_inputs(cutoff_freq, num_taps, sample_rate=None):
+    if not isinstance(num_taps, int) or num_taps <= 0:
+        raise FilterError("num_taps must be a positive integer.")
+    if not (0 < cutoff_freq <= 1):
+        raise FilterError("cutoff_freq must be in the range (0, 1].")
+    if sample_rate is not None and (not isinstance(sample_rate, int) or sample_rate <= 0):
+        raise FilterError("sample_rate must be a positive integer.")
+
 def sinc_function(x: float) -> float:
     """
     Sinc function, where sinc(0) = 1.
@@ -26,7 +38,7 @@ def lowpass_fir_filter_manual(cutoff_freq: float, num_taps: int) -> np.ndarray:
     numpy.ndarray: The normalized filter coefficients after applying the Hamming window.
 
     Raises:
-    ValueError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
+    FilterError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
 
     Example:
     --------
@@ -38,10 +50,7 @@ def lowpass_fir_filter_manual(cutoff_freq: float, num_taps: int) -> np.ndarray:
     >>> print(h)
     [0.06799017 0.28200983 0.3        0.28200983 0.06799017]
     """
-    if not isinstance(num_taps, int) or num_taps <= 0:
-        raise ValueError("num_taps must be a positive integer.")
-    if not (0 < cutoff_freq <= 1):
-        raise ValueError("cutoff_freq must be in the range (0, 1].")
+    validate_inputs(cutoff_freq, num_taps)
 
     M = num_taps - 1
     h = np.zeros(num_taps)
@@ -52,6 +61,47 @@ def lowpass_fir_filter_manual(cutoff_freq: float, num_taps: int) -> np.ndarray:
             h[n] = (2 * cutoff_freq) * sinc_function(3.15 * cutoff_freq * (n - M / 2))
         # Apply Hamming window
         h[n] *= 0.54 - 0.46 * np.cos(2 * np.pi * n / M)
+    # Normalize coefficients
+    h /= np.sum(h)
+    return h
+
+def lowpass_fir_filter_opt_manual(cutoff_freq: float, num_taps: int) -> np.ndarray:
+    """
+    Generates symmetric coefficients for a FIR low-pass filter using the sinc function and applies a Hamming window.
+
+    Parameters:
+    num_taps (int): The number of filter coefficients (taps).
+    cutoff_freq (float): The cutoff frequency of the filter (normalized to the Nyquist frequency, i.e., 0 < cutoff_freq <= 1).
+
+    Returns:
+    numpy.ndarray: The normalized filter coefficients after applying the Hamming window.
+
+    Raises:
+    FilterError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
+
+    Example:
+    --------
+    >>> import numpy as np
+    >>> from fir_filter_lowpass import lowpass_fir_filter_manual
+    >>> num_taps = 5
+    >>> cutoff_freq = 0.25
+    >>> h = lowpass_fir_filter_manual(cutoff_freq, num_taps)
+    >>> print(h)
+    [0.06799017 0.28200983 0.3        0.28200983 0.06799017]
+    """
+    validate_inputs(cutoff_freq, num_taps)
+
+    M = num_taps - 1
+    n = np.arange(num_taps)
+    n_centered = n - M / 2  # Center the taps around M / 2
+
+    # Handle the special case where n == M / 2
+    h = np.where(n_centered == 0, 2 * cutoff_freq, (2 * cutoff_freq) * sinc_function(3.15 * cutoff_freq * n_centered)) #Vectorization
+
+    # Apply the Hamming window
+    window = 0.54 - 0.46 * np.cos(2 * np.pi * n / M)
+    h *= window
+
     # Normalize coefficients
     h /= np.sum(h)
     return h
@@ -68,7 +118,7 @@ def lowpass_fir_filter_firwin(cutoff_freq: float, num_taps: int) -> np.ndarray:
     numpy.ndarray: The filter coefficients.
 
     Raises:
-    ValueError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
+    FilterError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
 
     Example:
     --------
@@ -80,10 +130,7 @@ def lowpass_fir_filter_firwin(cutoff_freq: float, num_taps: int) -> np.ndarray:
     >>> print(h)
     [0.06799017 0.28200983 0.3        0.28200983 0.06799017]
     """
-    if not isinstance(num_taps, int) or num_taps <= 0:
-        raise ValueError("num_taps must be a positive integer.")
-    if not (0 < cutoff_freq <= 1):
-        raise ValueError("cutoff_freq must be in the range (0, 1].")
+    validate_inputs(cutoff_freq, num_taps)
 
     return firwin(num_taps, cutoff=cutoff_freq, window="hamming")
 
@@ -97,19 +144,14 @@ def plot_filter_responses(cutoff_freq: float, num_taps: int, sample_rate: int):
     sample_rate (int): The sample rate of the signal.
 
     Raises:
-    ValueError: If num_taps is not a positive integer, if cutoff_freq is not in the range (0, 1], or if sample_rate is not a positive integer.
+    FilterError: If num_taps is not a positive integer, if cutoff_freq is not in the range (0, 1], or if sample_rate is not a positive integer.
 
     Example:
     --------
     >>> from fir_filter_lowpass import plot_filter_responses
     >>> plot_filter_responses(0.25, 5, 1000)
     """
-    if not isinstance(num_taps, int) or num_taps <= 0:
-        raise ValueError("num_taps must be a positive integer.")
-    if not (0 < cutoff_freq <= 1):
-        raise ValueError("cutoff_freq must be in the range (0, 1].")
-    if not isinstance(sample_rate, int) or sample_rate <= 0:
-        raise ValueError("sample_rate must be a positive integer.")
+    validate_inputs(cutoff_freq, num_taps, sample_rate)
 
     h_manual = lowpass_fir_filter_manual(cutoff_freq, num_taps)
     h_firwin = lowpass_fir_filter_firwin(cutoff_freq, num_taps)
@@ -135,17 +177,14 @@ def plot_filter_coefficients(cutoff_freq: float, num_taps: int):
     num_taps (int): The number of filter coefficients (taps).
 
     Raises:
-    ValueError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
+    FilterError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
 
     Example:
     --------
     >>> from fir_filter_lowpass import plot_filter_coefficients
     >>> plot_filter_coefficients(0.25, 5)
     """
-    if not isinstance(num_taps, int) or num_taps <= 0:
-        raise ValueError("num_taps must be a positive integer.")
-    if not (0 < cutoff_freq <= 1):
-        raise ValueError("cutoff_freq must be in the range (0, 1].")
+    validate_inputs(cutoff_freq, num_taps)
 
     h_manual = lowpass_fir_filter_manual(cutoff_freq, num_taps)
     h_firwin = lowpass_fir_filter_firwin(cutoff_freq, num_taps)
@@ -162,6 +201,79 @@ def plot_filter_coefficients(cutoff_freq: float, num_taps: int):
     plt.subplot(1, 2, 2)
     plt.stem(h_firwin)
     plt.title('Firwin Filter Coefficients')
+    plt.xlabel('Tap')
+    plt.ylabel('Coefficient Value')
+    plt.grid()
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_filter_opt_responses(cutoff_freq: float, num_taps: int, sample_rate: int):
+    """
+    Plots the frequency responses of the filters generated by both manual and firwin methods.
+
+    Parameters:
+    cutoff_freq (float): The cutoff frequency of the filter (normalized to the Nyquist frequency, i.e., 0 < cutoff_freq <= 1).
+    num_taps (int): The number of filter coefficients (taps).
+    sample_rate (int): The sample rate of the signal.
+
+    Raises:
+    FilterError: If num_taps is not a positive integer, if cutoff_freq is not in the range (0, 1], or if sample_rate is not a positive integer.
+
+    Example:
+    --------
+    >>> from fir_filter_lowpass import plot_filter_responses
+    >>> plot_filter_responses(0.25, 5, 1000)
+    """
+    validate_inputs(cutoff_freq, num_taps, sample_rate)
+    h_manual = lowpass_fir_filter_opt_manual(cutoff_freq, num_taps)
+    h_firwin = lowpass_fir_filter_firwin(cutoff_freq, num_taps)
+
+    w_manual, h_response_manual = np.fft.fftfreq(1024, 1 / sample_rate), np.abs(np.fft.fft(h_manual, 1024))
+    w_firwin, h_response_firwin = np.fft.fftfreq(1024, 1 / sample_rate), np.abs(np.fft.fft(h_firwin, 1024))
+
+    plt.plot(w_manual[:512], 20 * np.log10(h_response_manual[:512]), label='Manual')
+    plt.plot(w_firwin[:512], 20 * np.log10(h_response_firwin[:512]), label='Firwin')
+    plt.title('Frequency Response')
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude (dB)')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+def plot_filter_opt_coefficients(cutoff_freq: float, num_taps: int):
+    """
+    Plots the filter coefficients generated by both manual and firwin methods side by side.
+
+    Parameters:
+    cutoff_freq (float): The cutoff frequency of the filter (normalized to the Nyquist frequency, i.e., 0 < cutoff_freq <= 1).
+    num_taps (int): The number of filter coefficients (taps).
+
+    Raises:
+    FilterError: If num_taps is not a positive integer or if cutoff_freq is not in the range (0, 1].
+
+    Example:
+    --------
+    >>> from fir_filter_lowpass import plot_filter_coefficients
+    >>> plot_filter_coefficients(0.25, 5)
+    """
+    validate_inputs(cutoff_freq, num_taps)
+
+    h_manual = lowpass_fir_filter_opt_manual(cutoff_freq, num_taps)
+    h_firwin = lowpass_fir_filter_firwin(cutoff_freq, num_taps)
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.stem(h_manual)
+    plt.title('Manual Optimized FIR Lowpass Filter Coefficients')
+    plt.xlabel('Tap')
+    plt.ylabel('Coefficient Value')
+    plt.grid()
+
+    plt.subplot(1, 2, 2)
+    plt.stem(h_firwin)
+    plt.title('Firwin Optimized FIR Lowpass Filter Coefficients')
     plt.xlabel('Tap')
     plt.ylabel('Coefficient Value')
     plt.grid()
