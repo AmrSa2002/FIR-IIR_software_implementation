@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['main_0',['main',['../namespacemain.html',1,'main'],['../namespacemain.html#a3140e9a5b6a71ffbf498198cfc471b88',1,'main.main()']]],
+  ['main_2epy_1',['main.py',['../main_8py.html',1,'']]],
+  ['measure_5fperformance_5fbandpass_2',['measure_performance_bandpass',['../namespacefir__compare.html#abf9ba4900d27c00c054858d8c2423aa5',1,'fir_compare']]],
+  ['measure_5fperformance_5fhighpass_3',['measure_performance_highpass',['../namespacefir__compare.html#aea3e99a7eb416f353c3e0fad72850224',1,'fir_compare']]],
+  ['measure_5fperformance_5flowpass_4',['measure_performance_lowpass',['../namespacefir__compare.html#afaf03af276c33854ac6583bc748317d4',1,'fir_compare']]],
+  ['mem_5flp_5',['mem_lp',['../namespacefir__compare.html#ac3bb97571a51665e7bc6729ed081c692',1,'fir_compare']]],
+  ['memory_5fbandpass_6',['memory_bandpass',['../namespacefir__compare.html#a81d89940daf9fe50ff287b6c95cfe43b',1,'fir_compare']]],
+  ['memory_5fbandpass_5ffir_7',['memory_bandpass_fir',['../namespacefir__compare.html#a9e6b5204414afa92679ec2e524fa230f',1,'fir_compare']]],
+  ['memory_5fbandpass_5ffir_5fopt_8',['memory_bandpass_fir_opt',['../namespacefir__compare.html#a62b3ca760e0d16cf054ae75771f241a7',1,'fir_compare']]],
+  ['memory_5fbandpass_5fopt_9',['memory_bandpass_opt',['../namespacefir__compare.html#a207b7617b708e42a31176bc8961423ca',1,'fir_compare']]],
+  ['memory_5fhighpass_10',['memory_highpass',['../namespacefir__compare.html#a4a29a054d4cd43d4c51f3327c1d48f27',1,'fir_compare']]],
+  ['memory_5fhighpass_5ffir_11',['memory_highpass_fir',['../namespacefir__compare.html#abb14349f270386469875f45666d85638',1,'fir_compare']]],
+  ['memory_5fhighpass_5ffir_5fopt_12',['memory_highpass_fir_opt',['../namespacefir__compare.html#a02a110660b13d1d2d91a852a98389222',1,'fir_compare']]],
+  ['memory_5fhighpass_5fopt_13',['memory_highpass_opt',['../namespacefir__compare.html#addd6876ceddb37742269a8494a162de2',1,'fir_compare']]],
+  ['memory_5flowpass_14',['memory_lowpass',['../namespacefir__compare.html#a06bf03ee4fc3261361fd9687b4b83ef9',1,'fir_compare']]],
+  ['memory_5flowpass_5fopt_15',['memory_lowpass_opt',['../namespacefir__compare.html#ac821bb96a18d682f254c70c85086e148',1,'fir_compare']]]
+];
