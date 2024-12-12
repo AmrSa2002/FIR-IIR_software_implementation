@@ -7,7 +7,6 @@ from filters.fir_filter_bandpass import bandpass_fir_filter_manual, bandpass_fir
 from memory_profiler import profile
 import time
 import psutil
-from line_profiler import LineProfiler
 
 def measure_performance_highpass():
     """
