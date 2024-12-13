@@ -102,7 +102,7 @@ def highpass_fir_filter_opt_manual(cutoff_freq: float, num_taps: int) -> np.ndar
     h = np.where( # Selects values based on the given condition.
         n == M,
         1 - wc / np.pi,
-        -np.sin(wc * (n - M)) / (np.pi * (n - M))
+        -np.sin(wc * (n - M)) / (np.pi * (n - M + 1e-10)) ## A small constant (1e-10) is addedto prevent division by zero 
     )
 
     # Apply Hamming window
