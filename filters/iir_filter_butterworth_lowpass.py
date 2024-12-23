@@ -17,76 +17,55 @@ def validate_inputs(order, cutoff, fs):
         raise FilterErrorLp("Cutoff frequency must be less than half the sampling frequency.")
 
 def butterworth_lp_manual(order: int, cutoff: float, fs: float) -> tuple:
-    """
-    Generates Butterworth low-pass filter coefficients manually with proper normalization.
-
-    Parameters:
-    order (int): The order of the filter.
-    cutoff (float): The cutoff frequency of the filter.
-    fs (float): The sampling frequency.
-
-    Returns:
-    tuple: Numerator (b) and denominator (a) coefficients of the filter.
-
-    Example:
-    >>> order = 4
-    >>> cutoff = 1000.0  # 1 kHz
-    >>> fs = 8000.0  # 8 kHz sampling frequency
-    >>> b, a = butterworth_lp_manual(order, cutoff, fs)
-    >>> print(b)
-    >>> print(a)
-    """
     validate_inputs(order, cutoff, fs)
     nyquist = fs / 2
     normalized_cutoff = cutoff / nyquist
 
     # Analog cutoff frequency (rad/s)
-    wc = 2 * np.pi * cutoff  # Analog cutoff frequency
+    wc = 2 * np.pi * cutoff
 
     # Compute analog poles for Butterworth filter
     poles = [
         wc * np.exp(1j * np.pi * (0.38 * k + 1) / (0.38 * order)) for k in range(order)
     ]
-    poles = np.array([p for p in poles if np.real(p) < 0])  # Keep only left half-plane poles
+    poles = np.array([p for p in poles if np.real(p) < 0])
 
     # Analog filter coefficients
     a_analog = np.poly(poles)
-    b_analog = np.array([wc**order])  # Numerator is scaled by wc^order
+    b_analog = np.array([wc**order])
 
     # Bilinear transformation to digital filter
     b, a = bilinear(b_analog, a_analog, fs)
     return b, a
 
 def butterworth_lp_builtin(order: int, cutoff: float, fs: float) -> tuple:
-    """
-    Generates Butterworth low-pass filter coefficients using built-in function.
-
-    Parameters:
-    order (int): The order of the filter.
-    cutoff (float): The cutoff frequency of the filter.
-    fs (float): The sampling frequency.
-
-    Returns:
-    tuple: Numerator (b) and denominator (a) polynomials of the IIR filter.
-
-    Example:
-    >>> order = 4
-    >>> cutoff = 1000.0  # 1 kHz
-    >>> fs = 8000.0  # 8 kHz sampling frequency
-    >>> b, a = butterworth_lp_builtin(order, cutoff, fs)
-    >>> print(b)
-    >>> print(a)
-    """
     validate_inputs(order, cutoff, fs)
     nyquist = fs / 2
     normalized_cutoff = cutoff / nyquist
     b, a = butter(order, normalized_cutoff, btype='low')
     return b, a
 
+def butterworth_lp_manual_opt(order: int, cutoff: float, fs: float) -> tuple:
+    validate_inputs(order, cutoff, fs)
+
+    nyquist = fs / 2
+    normalized_cutoff = cutoff / nyquist
+
+    k = np.arange(1, order + 1, dtype=np.float32)
+    angles = (2 * k - 1) * np.pi / (2 * order)
+
+    poles = np.exp(1j * angles)
+    poles = np.multiply(poles, normalized_cutoff)
+
+    poles = poles[np.real(poles) < 0]
+
+    a_analog = np.poly(poles)
+    b_analog = np.array([normalized_cutoff**order])
+
+    b, a = bilinear(b_analog, a_analog, fs)
+    return b, a
+
 def plot_coefficients(order: int, cutoff: float, fs: float) -> None:
-    """
-    Plots the coefficients of manually generated and built-in Butterworth low-pass filters.
-    """
     validate_inputs(order, cutoff, fs)
     b_manual, a_manual = butterworth_lp_manual(order, cutoff, fs)
     b_builtin, a_builtin = butterworth_lp_builtin(order, cutoff, fs)
@@ -108,19 +87,22 @@ def plot_coefficients(order: int, cutoff: float, fs: float) -> None:
     plt.show()
 
 def plot_frequency_response(order: int, cutoff: float, fs: float) -> None:
-    """
-    Plots the frequency response of manually generated and built-in Butterworth low-pass filters.
-    """
     validate_inputs(order, cutoff, fs)
     b_manual, a_manual = butterworth_lp_manual(order, cutoff, fs)
+    b_opt, a_opt = butterworth_lp_manual_opt(order, cutoff, fs)
     b_builtin, a_builtin = butterworth_lp_builtin(order, cutoff, fs)
 
     w_manual, h_manual = freqz(b_manual, a_manual, worN=8000)
+    w_opt, h_opt = freqz(b_opt, a_opt, worN=8000)
     w_builtin, h_builtin = freqz(b_builtin, a_builtin, worN=8000)
 
+    eps = 1e-10
+
     plt.figure()
-    plt.plot(w_manual * fs / (2 * np.pi), 20 * np.log10(np.abs(h_manual)), 'b', label='Manual')
-    plt.plot(w_builtin * fs / (2 * np.pi), 20 * np.log10(np.abs(h_builtin)), 'g--', label='Built-in')
+    plt.plot(w_manual * fs / (2 * np.pi), 20 * np.log10(np.abs(h_manual) + eps), 'b', label='Manual')
+    plt.plot(w_opt * fs / (2 * np.pi), 20 * np.log10(np.abs(h_opt) + eps), 'r--', label='Optimized')
+    plt.plot(w_builtin * fs / (2 * np.pi), 20 * np.log10(np.abs(h_builtin) + eps), 'g--', label='Built-in')
+
     plt.title('Frequency Response')
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Gain (dB)')
@@ -129,9 +111,6 @@ def plot_frequency_response(order: int, cutoff: float, fs: float) -> None:
     plt.show()
 
 def compare_coefficients(order: int, cutoff: float, fs: float) -> None:
-    """
-    Compares the coefficients of manually generated and built-in Butterworth low-pass filters.
-    """
     validate_inputs(order, cutoff, fs)
     b_manual, a_manual = butterworth_lp_manual(order, cutoff, fs)
     b_builtin, a_builtin = butterworth_lp_builtin(order, cutoff, fs)
@@ -144,16 +123,21 @@ def compare_coefficients(order: int, cutoff: float, fs: float) -> None:
     print("Numerator (b):", b_builtin)
     print("Denominator (a):", a_builtin)
 
-# Filter parameters
-fs = 1000  # Sampling frequency
-cutoff = 100  # Cutoff frequency
-order = 4  # Filter order
+def plot_lowpass_filter_opt_responses(order: int, cutoff: float, fs: int):
+    validate_inputs(order, cutoff, fs)
 
-# Plotting coefficients
-#plot_coefficients(order, cutoff, fs)
+    b_manual, a_manual = butterworth_lp_manual(order, cutoff, fs)
+    b_opt, a_opt = butterworth_lp_manual_opt(order, cutoff, fs)
 
-# Plotting frequency response
-#plot_frequency_response(order, cutoff, fs)
+    w_manual, h_manual = freqz(b_manual, a_manual, worN=8000)
+    w_opt, h_opt = freqz(b_opt, a_opt, worN=8000)
 
-# Comparing coefficients
-#compare_coefficients(order, cutoff, fs)
+    plt.figure()
+    plt.plot(w_manual * fs / (2 * np.pi), 20 * np.log10(np.abs(h_manual) + 1e-10), 'b', label='Manual')
+    plt.plot(w_opt * fs / (2 * np.pi), 20 * np.log10(np.abs(h_opt) + 1e-10), 'r--', label='Optimized')
+    plt.title('Frequency Response of IIR Low-pass Filter')
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Gain (dB)')
+    plt.legend()
+    plt.grid()
+    plt.show()

@@ -71,6 +71,7 @@ def main():
     # IIR Highpass filter
     print("IIR Highpass Filter")
     plot_iir_highpass_response(order, cutoff_freq_highpass * sample_rate / 2, sample_rate)
+    
 
 if __name__ == "__main__":
     main()
