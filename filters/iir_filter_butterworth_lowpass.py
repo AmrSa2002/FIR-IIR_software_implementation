@@ -86,6 +86,27 @@ def plot_coefficients(order: int, cutoff: float, fs: float) -> None:
     plt.tight_layout()
     plt.show()
 
+def plot_opt_coefficients(order: int, cutoff: float, fs: float) -> None:
+    validate_inputs(order, cutoff, fs)
+    b_manual, a_manual = butterworth_lp_manual_opt(order, cutoff, fs)
+    b_builtin, a_builtin = butterworth_lp_builtin(order, cutoff, fs)
+
+    plt.figure()
+    plt.subplot(2, 1, 1)
+    plt.stem(b_manual, linefmt='b-', markerfmt='bo', basefmt='r-', label='Manual')
+    plt.stem(b_builtin, linefmt='g-', markerfmt='go', basefmt='r-', label='Built-in')
+    plt.title('Numerator Coefficients')
+    plt.legend()
+
+    plt.subplot(2, 1, 2)
+    plt.stem(a_manual, linefmt='b-', markerfmt='bo', basefmt='r-', label='Manual')
+    plt.stem(a_builtin, linefmt='g-', markerfmt='go', basefmt='r-', label='Built-in')
+    plt.title('Denominator Coefficients')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
 def plot_frequency_response(order: int, cutoff: float, fs: float) -> None:
     validate_inputs(order, cutoff, fs)
     b_manual, a_manual = butterworth_lp_manual(order, cutoff, fs)
