@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, freqz
 
+
 class FilterErrorBp(Exception):
     """Custom exception for filter errors."""
     pass
@@ -211,10 +212,10 @@ def plot_bandpass_filter_opt_responses(order: int, low_cutoff: float, high_cutof
     validate_inputs(order, low_cutoff, high_cutoff, fs)
 
     # Get coefficients for manual IIR bandpass filter
-    b_manual, a_manual = butterworth_bandpass_manual(order, low_cutoff, high_cutoff, fs)
+    b_manual, a_manual = butterworth_bp_manual(order, low_cutoff, high_cutoff, fs)
     
     # Get coefficients for optimized IIR bandpass filter
-    b_opt, a_opt = butterworth_bandpass_manual_opt(order, low_cutoff, high_cutoff, fs)
+    b_opt, a_opt = butterworth_bp_manual_opt(order, low_cutoff, high_cutoff, fs)
 
     # Compute frequency response for manual filter
     w_manual, h_manual = freqz(b_manual, a_manual, worN=8000)
@@ -252,10 +253,10 @@ def plot_bandpass_filter_opt_coefficients(order: int, low_cutoff: float, high_cu
     validate_inputs(order, low_cutoff, high_cutoff, fs)
 
     # Get coefficients for manual IIR bandpass filter
-    b_manual, a_manual = butterworth_bandpass_manual(order, low_cutoff, high_cutoff, fs)
+    b_manual, a_manual = butterworth_bp_manual(order, low_cutoff, high_cutoff, fs)
     
     # Get coefficients for optimized IIR bandpass filter
-    b_opt, a_opt = butterworth_bandpass_manual_opt(order, low_cutoff, high_cutoff, fs)
+    b_opt, a_opt = butterworth_bp_manual_opt(order, low_cutoff, high_cutoff, fs)
 
     # Plot coefficients
     plt.figure(figsize=(12, 6))

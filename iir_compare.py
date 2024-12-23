@@ -109,7 +109,6 @@ if __name__ == "__main__":
     measure_performance_bandpass()
     
 
-
 # Function for profiling memory usage for IIR high-pass filter
 @profile
 def memory_iir_highpass():

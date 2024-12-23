@@ -33,11 +33,10 @@ def measure_performance_highpass():
         ),
         number=1000
     )
-    print(f"Original function time: {original_time}")
-    print(f"Optimized function time: {optimized_time}")
+    print(f"HIGHPASS FIR Original function time: {original_time}")
+    print(f"HIGHPASS FIR Optimized function time: {optimized_time}")
+    print(f"HIGHPASS FIR - Performance improvement: {((original_time - optimized_time) / original_time) * 100:.2f}%")
 
-if __name__ == "__main__":
-    measure_performance_highpass()
 
 def measure_performance_lowpass():
     """

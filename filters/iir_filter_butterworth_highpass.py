@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.signal import butter, freqz, bilinear
 import matplotlib.pyplot as plt
+#from iir_compare import measure_performance_highpass_iir
 
 class FilterErrorHp(Exception):
     """Custom exception for filter errors."""
@@ -321,4 +322,4 @@ if __name__ == "__main__":
     test_memory_usage()
     
     # Vizualizacija koeficijenata filtera
-    plot_filter_coefficients(0.51, 4, 1000)
+    plot_coefficients(0.51, 4, 1000)

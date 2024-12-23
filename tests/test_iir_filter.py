@@ -60,6 +60,7 @@ def test_invalid_inputs_lowpass():
         butterworth_lp_manual(4, 100, -1000)
     with pytest.raises(FilterErrorLp):
         butterworth_lp_manual(4, 1000, 1000)
+        
 # Test invalid inputs for lowpass filter optimized
 def test_invalid_inputs_lowpass_opt():
     with pytest.raises(FilterErrorLp):
