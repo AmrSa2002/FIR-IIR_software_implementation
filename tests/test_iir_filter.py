@@ -5,8 +5,9 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from filters.iir_filter_butterworth_highpass import butterworth_hp_manual, butterworth_hp_builtin, FilterErrorHp
-from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual, butterworth_lp_builtin, FilterErrorLp
+from filters.iir_filter_butterworth_highpass import butterworth_hp_manual, butterworth_hp_builtin, butterworth_hp_manual_opt, FilterErrorHp
+from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual, butterworth_lp_builtin, butterworth_lp_manual_opt, FilterErrorLp
+from filters.iir_filter_butterworth_bandpass import butterworth_bp_manual, butterworth_bp_builtin, butterworth_bp_manual_opt, FilterErrorBp
 
 # Define the IIR filter parameters
 def create_iir_filter(filter_type, order, cutoff, fs):
@@ -59,6 +60,16 @@ def test_invalid_inputs_lowpass():
         butterworth_lp_manual(4, 100, -1000)
     with pytest.raises(FilterErrorLp):
         butterworth_lp_manual(4, 1000, 1000)
+# Test invalid inputs for lowpass filter optimized
+def test_invalid_inputs_lowpass_opt():
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(-1, 100, 1000)
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(4, -100, 1000)
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(4, 100, -1000)
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(4, 1000, 1000)
 
 # Test invalid inputs for highpass filter
 def test_invalid_inputs_highpass():
@@ -71,6 +82,17 @@ def test_invalid_inputs_highpass():
     with pytest.raises(FilterErrorHp):
         butterworth_hp_manual(4, 1000, 1000)
 
+# Test invalid inputs for highpass filter optimized
+def test_invalid_inputs_highpass_opt():
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(-1, 100, 1000)
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(4, -100, 1000)
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(4, 100, -1000)
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(4, 1000, 1000)
+
 # Additional tests for lowpass IIR filter
 def test_lowpass_iir_filter_manual_valid():
     """
@@ -80,6 +102,19 @@ def test_lowpass_iir_filter_manual_valid():
     cutoff_freq = 100
     sample_rate = 1000
     b, a = butterworth_lp_manual(order, cutoff_freq, sample_rate)
+    assert isinstance(b, np.ndarray)
+    assert isinstance(a, np.ndarray)
+    assert len(b) == order + 1
+    assert len(a) == order + 1
+
+def test_lowpass_iir_filter_manual_opt_valid():
+    """
+    Test lowpass IIR filter with valid parameters.
+    """
+    order = 4
+    cutoff_freq = 100
+    sample_rate = 1000
+    b, a = butterworth_lp_manual_opt(order, cutoff_freq, sample_rate)
     assert isinstance(b, np.ndarray)
     assert isinstance(a, np.ndarray)
     assert len(b) == order + 1
@@ -112,6 +147,19 @@ def test_highpass_iir_filter_manual_valid():
     assert len(b) == order + 1
     assert len(a) == order + 1
 
+def test_highpass_iir_filter_manual_opt_valid():
+    """
+    Test highpass IIR filter with valid parameters.
+    """
+    order = 4
+    cutoff_freq = 100
+    sample_rate = 1000
+    b, a = butterworth_hp_manual_opt(order, cutoff_freq, sample_rate)
+    assert isinstance(b, np.ndarray)
+    assert isinstance(a, np.ndarray)
+    assert len(b) == order + 1
+    assert len(a) == order + 1
+
 def test_highpass_iir_filter_builtin_valid():
     """
     Test highpass IIR filter using built-in function with valid parameters.
@@ -137,6 +185,17 @@ def test_lowpass_iir_filter_manual_edge_cases():
     with pytest.raises(FilterErrorLp):
         butterworth_lp_manual(4, 100, 0)
 
+def test_lowpass_iir_filter_manual_opt_edge_cases():
+    """
+    Test lowpass IIR filter with edge case parameters.
+    """
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(0, 100, 1000)
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(4, 0, 1000)
+    with pytest.raises(FilterErrorLp):
+        butterworth_lp_manual_opt(4, 100, 0)
+
 # Test edge cases for highpass IIR filter
 def test_highpass_iir_filter_manual_edge_cases():
     """
@@ -148,3 +207,108 @@ def test_highpass_iir_filter_manual_edge_cases():
         butterworth_hp_manual(4, 0, 1000)
     with pytest.raises(FilterErrorHp):
         butterworth_hp_manual(4, 100, 0)
+
+def test_highpass_iir_filter_manual_opt_edge_cases():
+    """
+    Test highpass IIR filter with edge case parameters.
+    """
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(0, 100, 1000)
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(4, 0, 1000)
+    with pytest.raises(FilterErrorHp):
+        butterworth_hp_manual_opt(4, 100, 0)
+
+#TESTS FOR BANDPASS
+
+# Test valid parameters for manual bandpass filter
+def test_bandpass_iir_filter_manual_valid():
+    """
+    Test bandpass IIR filter with valid parameters.
+    """
+    order = 4
+    lowcut = 50
+    highcut = 150
+    sample_rate = 500
+    b, a = butterworth_bp_manual(lowcut, highcut, sample_rate, order)
+    assert isinstance(b, np.ndarray)
+    assert isinstance(a, np.ndarray)
+    assert len(b) == len(a)
+
+# Test valid parameters for optimized manual bandpass filter
+def test_bandpass_iir_filter_manual_opt_valid():
+    """
+    Test bandpass IIR filter with valid parameters.
+    """
+    order = 4
+    lowcut = 50
+    highcut = 150
+    sample_rate = 500
+    b, a = butterworth_bp_manual_opt(lowcut, highcut, sample_rate, order)
+    assert isinstance(b, np.ndarray)
+    assert isinstance(a, np.ndarray)
+    assert len(b) == len(a)
+
+# Test valid parameters for built-in bandpass filter
+def test_bandpass_iir_filter_builtin_valid():
+    """
+    Test bandpass IIR filter using built-in function with valid parameters.
+    """
+    order = 4
+    lowcut = 50
+    highcut = 150
+    sample_rate = 500
+    b, a = butterworth_bp_builtin(lowcut, highcut, sample_rate, order)
+    assert isinstance(b, np.ndarray)
+    assert isinstance(a, np.ndarray)
+    assert len(b) == len(a)
+
+# Test invalid parameters for bandpass filter
+def test_invalid_inputs_bandpass():
+    """
+    Test invalid input scenarios for bandpass filter.
+    """
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(-50, 150, 500, 4)  # Negative lowcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, -150, 500, 4)  # Negative highcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 150, -500, 4)  # Negative sample rate
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 500, 500, 4)  # Highcut >= Nyquist
+
+# Test edge cases for bandpass filter
+def test_bandpass_iir_filter_manual_edge_cases():
+    """
+    Test edge cases for bandpass IIR filter.
+    """
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(0, 150, 500, 4)  # Zero lowcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 0, 500, 4)  # Zero highcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 150, 0, 4)  # Zero sample rate
+
+# Test optimized filter edge cases
+def test_bandpass_iir_filter_manual_opt_edge_cases():
+    """
+    Test edge cases for optimized bandpass IIR filter.
+    """
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual_opt(0, 150, 500, 4)  # Zero lowcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual_opt(50, 0, 500, 4)  # Zero highcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual_opt(50, 150, 0, 4)  # Zero sample rate
+
+# Test built-in filter edge cases
+def test_bandpass_iir_filter_builtin_edge_cases():
+    """
+    Test edge cases for built-in bandpass IIR filter.
+    """
+    with pytest.raises(ValueError):  # Built-in scipy function raises ValueError
+        butterworth_bp_builtin(0, 150, 500, 4)  # Zero lowcut
+    with pytest.raises(ValueError):
+        butterworth_bp_builtin(50, 0, 500, 4)  # Zero highcut
+    with pytest.raises(ValueError):
+        butterworth_bp_builtin(50, 150, 0, 4)  # Zero sample rate
