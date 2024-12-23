@@ -245,6 +245,10 @@ def test_bandpass_iir_filter_manual_opt_valid():
     lowcut = 50
     highcut = 150
     sample_rate = 500
+
+    assert lowcut > 0, "Lowcut frequency must be greater than zero"
+    assert highcut > 0, "Highcut frequency must be greater than zero"
+    assert highcut < sample_rate / 2, "Highcut frequency must be less than half the sample rate"
     b, a = butterworth_bp_manual_opt(lowcut, highcut, sample_rate, order)
     assert isinstance(b, np.ndarray)
     assert isinstance(a, np.ndarray)
@@ -277,6 +281,18 @@ def test_invalid_inputs_bandpass():
         butterworth_bp_manual(50, 150, -500, 4)  # Negative sample rate
     with pytest.raises(FilterErrorBp):
         butterworth_bp_manual(50, 500, 500, 4)  # Highcut >= Nyquist
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(200, 150, 500, 4)  # Lowcut >= Highcut
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(500, 150, 500, 4)  # Lowcut >= Nyquist
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 500, 500, -4)  # Negative order
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 500, 0, 4)  # Sampling frequency zero
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(0, 500, 500, 4)  # Lowcut zero
+    with pytest.raises(FilterErrorBp):
+        butterworth_bp_manual(50, 0, 500, 4)  # Highcut zero
 
 # Test edge cases for bandpass filter
 def test_bandpass_iir_filter_manual_edge_cases():
@@ -349,14 +365,16 @@ def test_plot_bandpass_iir_filter_responses():
     Test the plotting of bandpass filter responses.
     """
     from filters.iir_filter_butterworth_bandpass import plot_frequency_response
-    plot_frequency_response(b = 4, a = 3, lowcut=0.2, highcut=0.4, fs=1000)
+    b, a = butterworth_bp_builtin(lowcut=0.2, highcut=0.4, fs=1000)
+    plot_frequency_response(b=b, a=a, fs=1000, lowcut=0.2, highcut=0.4)
+
 
 def test_plot_bandpass_iir_filter_opt_responses():
     """
     Test the plotting of bandpass filter responses.
     """
     from filters.iir_filter_butterworth_bandpass import plot_bandpass_filter_opt_responses
-    plot_bandpass_filter_opt_responses(b = 4, a = 3, lowcut=0.2, highcut=0.4, fs=1000)
+    plot_bandpass_filter_opt_responses(order=4, low_cutoff=50, high_cutoff=150, fs=500)
 
 def test_plot_lowpass_iir_filter_coefficients():
     """
@@ -392,11 +410,11 @@ def test_plot_bandpass_iir_opt_filter_coefficients():
     Test the plotting of bandpass filter coefficients.
     """
     from filters.iir_filter_butterworth_bandpass import plot_bandpass_filter_opt_coefficients
-    plot_bandpass_filter_opt_coefficients(order = 4, low_cutoff=0.2, high_cutoff=0.4, fs = 1000)
+    plot_bandpass_filter_opt_coefficients(order=4, low_cutoff=50, high_cutoff=150, fs=500)
 
 def test_plot_bandpass_iir_filter_coefficients():
     """
     Test the plotting of optimized IIR bandpass filter coefficients.
     """
-    from filters.iir_filter_butterworth_bandpass import plot_bandpass_filter_coefficients
-    plot_bandpass_filter_coefficients(order = 4, low_cutoff=0.2, high_cutoff=0.4, fs = 1000)
+    from filters.iir_filter_butterworth_bandpass import plot_bandpass_iir_filter_coefficients
+    plot_bandpass_iir_filter_coefficients(order=4, low_cutoff=50, high_cutoff=150, fs=500)
