@@ -303,23 +303,3 @@ def plot_highpass_filter_opt_coefficients(order: int, cutoff: float,  fs: int):
     plt.tight_layout()
     plt.show()
 
-# Plotting coefficients
-plot_coefficients(order, cutoff, fs)
-plot_highpass_filter_opt_coefficients(order, cutoff, fs)
-
-# Plotting frequency response
-plot_frequency_response(order, cutoff, fs)
-plot_highpass_filter_opt_responses(order, cutoff, fs)
-
-# Comparing coefficients
-compare_coefficients(order, cutoff, fs)
-
-if __name__ == "__main__":
-    # Testiranje vremena izvršenja za IIR high-pass filter
-    measure_performance_highpass_iir()
-    
-    # Testiranje memorijske potrošnje
-    test_memory_usage()
-    
-    # Vizualizacija koeficijenata filtera
-    plot_coefficients(0.51, 4, 1000)

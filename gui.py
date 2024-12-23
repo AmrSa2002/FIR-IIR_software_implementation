@@ -9,6 +9,7 @@ from filters.fir_filter_bandpass import bandpass_fir_filter_opt_manual
 from filters.fir_filter_highpass import highpass_fir_filter_opt_manual
 from filters.iir_filter_butterworth_highpass import butterworth_hp_manual
 from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual
+from filters.iir_filter_butterworth_bandpass import butterworth_bp_manual_opt
 
 sampling_rate = 1000  # Definisanje podrazumevane vrednosti za sampling_rate
 
@@ -44,6 +45,9 @@ def apply_filter(filter_type, signal, cutoff_freq=0.5, num_taps=50, lowcut=0.2, 
     elif filter_type == "Lowpass_IIR":
         b, a = butterworth_lp_manual(order, cutoff_freq, sampling_rate)
         return lfilter(b, a, signal), b, a
+    elif filter_type == "Bandass_IIR":
+        b, a = butterworth_bp_manual_opt(lowcut, highcut, order, sampling_rate)
+        return lfilter(b, a, signal), b, a
 
 def fft_analysis(signal, sampling_rate):
     n = len(signal)
@@ -67,6 +71,11 @@ def plot_signals():
     elif filter_type == "Lowpass_IIR" or filter_type == "Highpass_IIR":
         filter_params['order'] = int(order_entry.get())
         filter_params['cutoff_freq'] = float(cutoff_entry.get())
+        filter_params['sampling_rate'] = float(sampling_rate_entry.get())
+    elif filter_type == "Bandpass_IIR":
+        filter_params['order'] = int(order_entry.get())
+        filter_params['lowcut'] = float(lowcut_entry.get())
+        filter_params['highcut'] = float(highcut_entry.get())
         filter_params['sampling_rate'] = float(sampling_rate_entry.get())
 
     t, signal = generate_signal(signal_type, frequency)
@@ -141,21 +150,66 @@ def on_filter_change(event):
         highcut_entry.grid_remove()
         num_taps_label.grid_remove()
         num_taps_entry.grid_remove()
+    elif selected_filter == "Bandpass_IIR":
+        order_label.grid(row=3, column=0, padx=5, pady=5, sticky=tk.W)
+        order_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
+        lowcut_label.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
+        lowcut_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+        highcut_label.grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
+        highcut_entry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
+        num_taps_label.grid(row=6, column=0, padx=5, pady=5, sticky=tk.W)
+        num_taps_entry.grid(row=6, column=1, padx=5, pady=5, sticky=tk.W)
+        cutoff_label.grid_remove()
+        cutoff_entry.grid_remove()
+        sampling_rate_label.grid_remove()
+        sampling_rate_entry.grid_remove()
+
+def fit_canvas_to_image(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+    canvas_width = max(event.width, 1300)  # Set a minimum width for the canvas
+    canvas.itemconfig(canvas_window, width=canvas_width)
+
+def on_mouse_wheel(event):
+    canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
 root = tk.Tk()
-root.title("Filter GUI")
+root.title("Filter Design")
 
-root.geometry("1200x800")
+# Set the size of the window (width x height)
+root.geometry("1250x768")  # Change the size as needed
 
+# Create a style
 style = ttk.Style()
-style.configure("TLabel", font=("Helvetica", 12))
-style.configure("TEntry", font=("Helvetica", 12))
-style.configure("TButton", font=("Helvetica", 12))
+style.configure("TFrame", background="#2596be")
+style.configure("TLabel", background="#f5d197", font=("Arial", 12))
+style.configure("TButton", background="#f5d197", font=("Arial", 12))
+style.configure("TCombobox", font=("Arial", 12))
 
-main_frame = ttk.Frame(root, padding="10 10 10 10")
-main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+# Create a frame for the canvas and scrollbar
+frame = ttk.Frame(root)
+frame.pack(fill=tk.BOTH, expand=True)
 
-# Stranica za izbor tipa signala
+# Add a canvas in that frame
+canvas = tk.Canvas(frame, bg="#579c65")
+canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+# Add a scrollbar to the frame
+scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=canvas.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Configure the canvas
+canvas.configure(yscrollcommand=scrollbar.set)
+canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+
+# Create another frame inside the canvas
+main_frame = ttk.Frame(canvas)
+canvas_window = canvas.create_window((0, 0), window=main_frame, anchor="nw")
+
+# Bind the configure event to fit the canvas to the image width
+main_frame.bind("<Configure>", fit_canvas_to_image)
+
+# Add your widgets to main_frame
 signal_type_label = ttk.Label(main_frame, text="Tip signala:")
 signal_type_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
 signal_type = tk.StringVar()
@@ -163,7 +217,6 @@ signal_type_combobox = ttk.Combobox(main_frame, textvariable=signal_type)
 signal_type_combobox['values'] = ("Pravougaoni", "Sinusni", "Sinusni sa šumom", "Pravougaoni sa šumom", "Višefrekvencijski")
 signal_type_combobox.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
 
-# Stranica za izbor frekvencije
 frequency_label = ttk.Label(main_frame, text="Frekvencija (Hz):")
 frequency_label.grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
 frequency_entry = ttk.Entry(main_frame)
@@ -174,7 +227,7 @@ filter_label = ttk.Label(main_frame, text="Filter:")
 filter_label.grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
 filter_type = tk.StringVar()
 filter_combobox = ttk.Combobox(main_frame, textvariable=filter_type)
-filter_combobox['values'] = ("Lowpass_FIR", "Bandpass_FIR", "Highpass_FIR", "Lowpass_IIR", "Highpass_IIR")
+filter_combobox['values'] = ("Lowpass_FIR", "Bandpass_FIR", "Highpass_FIR", "Lowpass_IIR", "Highpass_IIR", "Bandpass_IIR")
 filter_combobox.grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
 filter_combobox.bind("<<ComboboxSelected>>", on_filter_change)
 
@@ -198,9 +251,9 @@ sampling_rate_label = ttk.Label(main_frame, text="Sampling rate (Hz):")
 sampling_rate_entry = ttk.Entry(main_frame)
 
 plot_button = ttk.Button(main_frame, text="Prikaži signal", command=plot_signals)
-plot_button.grid(row=6, column=0, columnspan=2, pady=20)
+plot_button.grid(row=7, column=0, columnspan=2, pady=20)
 
 plot_frame = ttk.Frame(main_frame)
-plot_frame.grid(row=7, column=0, columnspan=2, pady=20, sticky=(tk.W, tk.E, tk.N, tk.S))
+plot_frame.grid(row=8, column=0, columnspan=2, pady=20, sticky=(tk.W, tk.E, tk.N, tk.S))
 
 root.mainloop()

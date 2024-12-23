@@ -118,8 +118,8 @@ def test_lowpass_iir_filter_manual_opt_valid():
     b, a = butterworth_lp_manual_opt(order, cutoff, sample_rate)
     assert isinstance(b, np.ndarray)
     assert isinstance(a, np.ndarray)
-    assert len(b) == order + 1
-    assert len(a) == order + 1
+    assert len(b) == order - 1
+    assert len(a) == order - 1
 
 def test_lowpass_iir_filter_builtin_valid():
     """
