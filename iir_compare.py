@@ -239,7 +239,7 @@ plt.ylabel("Memory (MB)")
 plt.title("Bandpass Filter Memory Comparison")
 plt.legend()
 plt.grid()
-plt.show()
+#plt.show()
 
 
 
