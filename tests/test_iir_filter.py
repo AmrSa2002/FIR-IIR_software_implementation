@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from filters.iir_filter_butterworth_highpass import butterworth_hp_manual, butterworth_hp_builtin, butterworth_hp_manual_opt, FilterErrorHp
-from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual, butterworth_lp_builtin, butterworth_lp_manual_opt, plot_frequency_response, FilterErrorLp
+from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual, butterworth_lp_builtin, butterworth_lp_manual_opt, FilterErrorLp
 from filters.iir_filter_butterworth_bandpass import butterworth_bp_manual, butterworth_bp_builtin, butterworth_bp_manual_opt, FilterErrorBp
 
 # Define the IIR filter parameters
@@ -336,8 +336,9 @@ def test_plot_lowpass_iir_filter_responses():
     """
     Test the plotting of lowpass filter responses.
     """
-    from filters.iir_filter_butterworth_lowpass import plot_frequency_response
-    plot_frequency_response(order=4, cutoff=0.3, fs=1000)
+    from filters.iir_filter_butterworth_lowpass import plot_lowpass_filter_responses
+    plot_lowpass_filter_responses(order=4, cutoff=0.3, fs=1000)
+    
 
 def test_plot_lowpass_iir_opt_filter_responses():
     """
@@ -350,8 +351,8 @@ def test_plot_highpass_iir_opt_filter_responses():
     """
     Test the plotting of optimized highpass filter responses.
     """
-    from filters.iir_filter_butterworth_highpass import plot_highpass_filter_opt_responses
-    plot_highpass_filter_opt_responses(order = 4, cutoff=0.3, fs=1000)
+    from filters.iir_filter_butterworth_highpass import plot_iir_highpass_filter_opt_responses
+    plot_iir_highpass_filter_opt_responses(order = 4, cutoff=0.3, fs=1000)
 
 def test_plot_highpass_iir_filter_responses():
     """
@@ -373,8 +374,8 @@ def test_plot_bandpass_iir_filter_opt_responses():
     """
     Test the plotting of bandpass filter responses.
     """
-    from filters.iir_filter_butterworth_bandpass import plot_bandpass_filter_opt_responses
-    plot_bandpass_filter_opt_responses(order=4, low_cutoff=50, high_cutoff=150, fs=500)
+    from filters.iir_filter_butterworth_bandpass import plot_iir_bandpass_filter_opt_responses
+    plot_iir_bandpass_filter_opt_responses(order=4, low_cutoff=50, high_cutoff=150, fs=500)
 
 def test_plot_lowpass_iir_filter_coefficients():
     """
@@ -402,15 +403,15 @@ def test_plot_highpass_iir_filter_opt_coefficients():
     """
     Test the plotting of optimized highpass filter coefficients.
     """
-    from filters.iir_filter_butterworth_highpass import plot_highpass_filter_opt_coefficients
-    plot_highpass_filter_opt_coefficients(order = 4, cutoff = 0.3, fs = 1000)
+    from filters.iir_filter_butterworth_highpass import plot_iir_highpass_filter_opt_coefficients
+    plot_iir_highpass_filter_opt_coefficients(order = 4, cutoff = 0.3, fs = 1000)
 
 def test_plot_bandpass_iir_opt_filter_coefficients():
     """
     Test the plotting of bandpass filter coefficients.
     """
-    from filters.iir_filter_butterworth_bandpass import plot_bandpass_filter_opt_coefficients
-    plot_bandpass_filter_opt_coefficients(order=4, low_cutoff=50, high_cutoff=150, fs=500)
+    from filters.iir_filter_butterworth_bandpass import plot_iir_bandpass_filter_opt_coefficients
+    plot_iir_bandpass_filter_opt_coefficients(order=4, low_cutoff=50, high_cutoff=150, fs=500)
 
 def test_plot_bandpass_iir_filter_coefficients():
     """

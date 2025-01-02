@@ -99,9 +99,9 @@ def measure_performance_bandpass():
         number=1000
     )
 
-    print(f"BANDPASS - Original: {original_time:.6f}s")
-    print(f"BANDPASS - Optimized: {optimized_time:.6f}s")
-    print(f"BANDPASS - Improvement: {((original_time - optimized_time) / original_time) * 100:.2f}%")
+    print(f"BANDPASS IIR - Original function time: {original_time:.6f}s")
+    print(f"BANDPASS IIR - Optimized function time: {optimized_time:.6f}s")
+    print(f"BANDPASS IIR - Performance improvement: {((original_time - optimized_time) / original_time) * 100:.2f}%")
 
 if __name__ == "__main__":
     measure_performance_highpass_iir()
