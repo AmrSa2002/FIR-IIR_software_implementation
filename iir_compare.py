@@ -268,7 +268,7 @@ def track_memory_usage_bp(func):
             elapsed_time.append(time.time() - start_time)
             time.sleep(0.01)  # Sampling interval
         # Execute the function
-        func(0.2, 0.51, 1000, 4)
+        func(4, 100, 300, 1000)
         # Collect final memory and time data
         memory_usage.append(process.memory_info().rss / 1024**2)
         elapsed_time.append(time.time() - start_time)
