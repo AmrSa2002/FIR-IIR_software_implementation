@@ -9,11 +9,11 @@ from filters.fir_filter_bandpass import bandpass_fir_filter_opt_manual
 from filters.fir_filter_highpass import highpass_fir_filter_opt_manual
 from filters.iir_filter_butterworth_highpass import butterworth_hp_manual
 from filters.iir_filter_butterworth_lowpass import butterworth_lp_manual
-from filters.iir_filter_butterworth_bandpass import butterworth_bp_manual_opt
+from filters.iir_filter_butterworth_bandpass import butterworth_bp_builtin
 
 sampling_rate = 1000  # Definisanje podrazumevane vrednosti za sampling_rate
 
-def generate_signal(signal_type, frequency, duration=1.0, sampling_rate=1000):
+def generate_signal(signal_type, frequency, duration=1.0, sampling_rate=2000):
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
     if signal_type == "Sinusni":
         return t, np.sin(2 * np.pi * frequency * t)
@@ -28,25 +28,25 @@ def generate_signal(signal_type, frequency, duration=1.0, sampling_rate=1000):
     else:
         raise ValueError("Nepoznat tip signala!")
 
-def apply_filter(filter_type, signal, cutoff_freq=0.5, num_taps=50, lowcut=0.2, highcut=0.4, order=4, sampling_rate=1000):
+def apply_filter(filter_type, signal, cutoff_freq=0.5, num_taps=50, lowcut=0.2, highcut=0.4, order=4, sampling_rate=2000):
     nyquist = 0.5 * sampling_rate
     if filter_type == "Lowpass_FIR":
-        fir_coeffs = lowpass_fir_filter_opt_manual(cutoff_freq / nyquist, num_taps)
+        fir_coeffs = lowpass_fir_filter_opt_manual(2* np.pi*cutoff_freq / sampling_rate, num_taps)
         return lfilter(fir_coeffs, [1], signal), fir_coeffs, [1]
     elif filter_type == "Bandpass_FIR":
-        fir_coeffs = bandpass_fir_filter_opt_manual(lowcut / nyquist, highcut / nyquist, num_taps)
+        fir_coeffs = bandpass_fir_filter_opt_manual(2* np.pi*lowcut / sampling_rate, 2* np.pi*highcut / sampling_rate, num_taps)
         return lfilter(fir_coeffs, [1], signal), fir_coeffs, [1]
     elif filter_type == "Highpass_FIR":
-        fir_coeffs = highpass_fir_filter_opt_manual(cutoff_freq / nyquist, num_taps)
+        fir_coeffs = highpass_fir_filter_opt_manual(2* np.pi*cutoff_freq / sampling_rate, num_taps)
         return lfilter(fir_coeffs, [1], signal), fir_coeffs, [1]
     elif filter_type == "Highpass_IIR":
-        b, a = butterworth_hp_manual(order, cutoff_freq, sampling_rate)
+        b, a = butterworth_hp_manual(order, 2* np.pi*cutoff_freq / sampling_rate, sampling_rate)
         return lfilter(b, a, signal), b, a
     elif filter_type == "Lowpass_IIR":
-        b, a = butterworth_lp_manual(order, cutoff_freq, sampling_rate)
+        b, a = butterworth_lp_manual(order, 2* np.pi*cutoff_freq / sampling_rate, sampling_rate)
         return lfilter(b, a, signal), b, a
     elif filter_type == "Bandass_IIR":
-        b, a = butterworth_bp_manual_opt(lowcut, highcut, order, sampling_rate)
+        b, a = butterworth_bp_builtin(order, 2* np.pi*lowcut / sampling_rate, 2* np.pi*highcut / sampling_rate, sampling_rate)
         return lfilter(b, a, signal), b, a
 
 def fft_analysis(signal, sampling_rate):
@@ -107,15 +107,15 @@ def plot_signals():
     plt.tight_layout()
     canvas = FigureCanvasTkAgg(fig, master=plot_frame)
     canvas.draw()
-    canvas.get_tk_widget().grid(row=0, column=0, pady=20, sticky=tk.N+tk.S+tk.E+tk.W)
+    canvas.get_tk_widget().grid(row=0, column=0, pady=10, sticky=tk.N+tk.S+tk.E+tk.W)
 
 def on_filter_change(event):
     selected_filter = filter_combobox.get()
     if selected_filter == "Lowpass_FIR" or selected_filter == "Highpass_FIR":
-        cutoff_label.grid(row=3, column=0, padx=5, pady=5, sticky=tk.W)
-        cutoff_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
-        num_taps_label.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
-        num_taps_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+        cutoff_label.grid(row=0, column=4, padx=5, pady=5, sticky=tk.W)
+        cutoff_entry.grid(row=0, column=5, padx=5, pady=5, sticky=tk.W)
+        num_taps_label.grid(row=1, column=4, padx=5, pady=5, sticky=tk.W)
+        num_taps_entry.grid(row=1, column=5, padx=5, pady=5, sticky=tk.W)
         lowcut_label.grid_remove()
         lowcut_entry.grid_remove()
         highcut_label.grid_remove()
@@ -125,12 +125,12 @@ def on_filter_change(event):
         sampling_rate_label.grid_remove()
         sampling_rate_entry.grid_remove()
     elif selected_filter == "Bandpass_FIR":
-        lowcut_label.grid(row=3, column=0, padx=5, pady=5, sticky=tk.W)
-        lowcut_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
-        highcut_label.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
-        highcut_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
-        num_taps_label.grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
-        num_taps_entry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
+        lowcut_label.grid(row=0, column=4, padx=5, pady=5, sticky=tk.W)
+        lowcut_entry.grid(row=0, column=5, padx=5, pady=5, sticky=tk.W)
+        highcut_label.grid(row=1, column=4, padx=5, pady=5, sticky=tk.W)
+        highcut_entry.grid(row=1, column=5, padx=5, pady=5, sticky=tk.W)
+        num_taps_label.grid(row=2, column=4, padx=5, pady=5, sticky=tk.W)
+        num_taps_entry.grid(row=2, column=5, padx=5, pady=5, sticky=tk.W)
         cutoff_label.grid_remove()
         cutoff_entry.grid_remove()
         order_label.grid_remove()
@@ -138,12 +138,12 @@ def on_filter_change(event):
         sampling_rate_label.grid_remove()
         sampling_rate_entry.grid_remove()
     elif selected_filter == "Lowpass_IIR" or selected_filter == "Highpass_IIR":
-        order_label.grid(row=3, column=0, padx=5, pady=5, sticky=tk.W)
-        order_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
-        cutoff_label.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
-        cutoff_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
-        sampling_rate_label.grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
-        sampling_rate_entry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
+        order_label.grid(row=0, column=4, padx=5, pady=5, sticky=tk.W)
+        order_entry.grid(row=0, column=5, padx=5, pady=5, sticky=tk.W)
+        cutoff_label.grid(row=1, column=4, padx=5, pady=5, sticky=tk.W)
+        cutoff_entry.grid(row=1, column=5, padx=5, pady=5, sticky=tk.W)
+        sampling_rate_label.grid(row=2, column=4, padx=5, pady=5, sticky=tk.W)
+        sampling_rate_entry.grid(row=2, column=5, padx=5, pady=5, sticky=tk.W)
         lowcut_label.grid_remove()
         lowcut_entry.grid_remove()
         highcut_label.grid_remove()
@@ -151,14 +151,14 @@ def on_filter_change(event):
         num_taps_label.grid_remove()
         num_taps_entry.grid_remove()
     elif selected_filter == "Bandpass_IIR":
-        order_label.grid(row=3, column=0, padx=5, pady=5, sticky=tk.W)
-        order_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
-        lowcut_label.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
-        lowcut_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
-        highcut_label.grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
-        highcut_entry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
-        num_taps_label.grid(row=6, column=0, padx=5, pady=5, sticky=tk.W)
-        num_taps_entry.grid(row=6, column=1, padx=5, pady=5, sticky=tk.W)
+        order_label.grid(row=0, column=4, padx=5, pady=5, sticky=tk.W)
+        order_entry.grid(row=0, column=5, padx=5, pady=5, sticky=tk.W)
+        lowcut_label.grid(row=1, column=4, padx=5, pady=5, sticky=tk.W)
+        lowcut_entry.grid(row=1, column=5, padx=5, pady=5, sticky=tk.W)
+        highcut_label.grid(row=2, column=4, padx=5, pady=5, sticky=tk.W)
+        highcut_entry.grid(row=2, column=5, padx=5, pady=5, sticky=tk.W)
+        num_taps_label.grid(row=3, column=4, padx=5, pady=5, sticky=tk.W)
+        num_taps_entry.grid(row=3, column=5, padx=5, pady=5, sticky=tk.W)
         cutoff_label.grid_remove()
         cutoff_entry.grid_remove()
         sampling_rate_label.grid_remove()
@@ -174,28 +174,37 @@ def on_mouse_wheel(event):
 
 root = tk.Tk()
 root.title("Filter Design")
+# Get screen width and height
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
 
-# Set the size of the window (width x height)
-root.geometry("1250x768")  # Change the size as needed
+# Set the size of the window (width x height) based on screen size
+window_width = int(screen_width * 0.8)  # 80% of screen width
+window_height = int(screen_height * 0.8)  # 80% of screen height
+root.geometry(f"{window_width}x{window_height}")
 
+# Make the window resizable
+root.rowconfigure(0, weight=1)
+root.columnconfigure(0, weight=1)
 # Create a style
 style = ttk.Style()
-style.configure("TFrame", background="#2596be")
-style.configure("TLabel", background="#f5d197", font=("Arial", 12))
-style.configure("TButton", background="#f5d197", font=("Arial", 12))
+style.configure("TFrame", background="#fafbf5")
+style.configure("TLabel", background="#fafbf5", font=("Arial", 12))
+style.configure("TButton", background="#dfee83", font=("Arial", 12))
 style.configure("TCombobox", font=("Arial", 12))
 
 # Create a frame for the canvas and scrollbar
 frame = ttk.Frame(root)
-frame.pack(fill=tk.BOTH, expand=True)
+frame.grid(row=0, column=0, sticky="nsew")
 
 # Add a canvas in that frame
-canvas = tk.Canvas(frame, bg="#579c65")
+canvas = tk.Canvas(frame, bg="#fafbf5")
 canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
 # Add a scrollbar to the frame
 scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=canvas.yview)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
 
 # Configure the canvas
 canvas.configure(yscrollcommand=scrollbar.set)
@@ -211,24 +220,24 @@ main_frame.bind("<Configure>", fit_canvas_to_image)
 
 # Add your widgets to main_frame
 signal_type_label = ttk.Label(main_frame, text="Tip signala:")
-signal_type_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+signal_type_label.grid(row=0, column=0, padx=5, pady=5)
 signal_type = tk.StringVar()
 signal_type_combobox = ttk.Combobox(main_frame, textvariable=signal_type)
 signal_type_combobox['values'] = ("Pravougaoni", "Sinusni", "Sinusni sa šumom", "Pravougaoni sa šumom", "Višefrekvencijski")
-signal_type_combobox.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
+signal_type_combobox.grid(row=0, column=1, padx=5, pady=5)
 
 frequency_label = ttk.Label(main_frame, text="Frekvencija (Hz):")
-frequency_label.grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
+frequency_label.grid(row=1, column=0, padx=5, pady=5)
 frequency_entry = ttk.Entry(main_frame)
-frequency_entry.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+frequency_entry.grid(row=1, column=1, padx=5, pady=5)
 
 # Stranica za izbor filtera
 filter_label = ttk.Label(main_frame, text="Filter:")
-filter_label.grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
+filter_label.grid(row=2, column=0, padx=5, pady=5)
 filter_type = tk.StringVar()
 filter_combobox = ttk.Combobox(main_frame, textvariable=filter_type)
 filter_combobox['values'] = ("Lowpass_FIR", "Bandpass_FIR", "Highpass_FIR", "Lowpass_IIR", "Highpass_IIR", "Bandpass_IIR")
-filter_combobox.grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
+filter_combobox.grid(row=2, column=1, padx=5, pady=5)
 filter_combobox.bind("<<ComboboxSelected>>", on_filter_change)
 
 # Parametri filtera
@@ -251,9 +260,9 @@ sampling_rate_label = ttk.Label(main_frame, text="Sampling rate (Hz):")
 sampling_rate_entry = ttk.Entry(main_frame)
 
 plot_button = ttk.Button(main_frame, text="Prikaži signal", command=plot_signals)
-plot_button.grid(row=7, column=0, columnspan=2, pady=20)
+plot_button.grid(row=4, column=0, columnspan=8, pady=20)
 
 plot_frame = ttk.Frame(main_frame)
-plot_frame.grid(row=8, column=0, columnspan=2, pady=20, sticky=(tk.W, tk.E, tk.N, tk.S))
+plot_frame.grid(row=5, column=0, columnspan=8, pady=20, sticky=(tk.W, tk.E, tk.N, tk.S))
 
 root.mainloop()

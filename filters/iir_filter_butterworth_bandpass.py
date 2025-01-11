@@ -28,7 +28,7 @@ def validate_inputs(order, lowcut, highcut, fs):
         raise FilterErrorBp("Lowcut frequency must be less than half the sampling frequency.")
     if lowcut >= highcut:
         raise FilterErrorBp("Lowcut frequency must be less than highcut frequency.")
-    
+
 
 def butterworth_bp_manual(order, lowcut: float, highcut: float, fs: float) -> tuple:
     """
@@ -142,20 +142,20 @@ def butterworth_bp_manual_opt(order, lowcut: float, highcut: float, fs: float) -
     # Calculate analog poles using vectorized operations
     angles = np.pi * (2 * np.arange(1, order + 1) - 1) / (2 * order)
     poles = wc_center * np.exp(1j * angles)
-    
+
     # Bilinear transformation to map analog poles to digital domain
     z_poles = (2 * fs + poles) / (2 * fs - poles)
     a = np.poly(z_poles).real
 
     # Calculate numerator coefficients directly
-    b = [bw ** order] + [0] * (len(a) - 1)
+    b = np.array([bw ** order] + [0] * (len(a) - 1))
     return b, a
 
 b_builtin, a_builtin = butterworth_bp_builtin(4, 100, 300, 1000)
 zeros, poles, gain = tf2zpk(b_builtin, a_builtin)
-zeros_manual = zeros  
-poles_manual = poles  
-gain_manual = gain    
+zeros_manual = zeros
+poles_manual = poles
+gain_manual = gain
 
 
 b_manual, a_manual = zpk2tf(zeros_manual, poles_manual, gain_manual)
@@ -171,10 +171,10 @@ def plot_iir_bandpass_filter_opt_responses(order: int, low_cutoff: float, high_c
     high_cutoff (float): The high cutoff frequency of the filter (in Hz).
     order (int): The order of the filter.
     fs (int): The sample rate of the signal (in Hz).
-    
+
     Raises:
     ValueError: If order is not a positive integer or if cutoff values are not positive.
-    
+
     Example:
     --------
     >>> plot_bandpass_filter_opt_responses(4, 100, 300, 1000)
@@ -210,10 +210,10 @@ def plot_iir_bandpass_filter_opt_coefficients(order: int, low_cutoff: float, hig
     high_cutoff (float): The high cutoff frequency of the filter (in Hz).
     order (int): The order of the filter.
     fs (int): The sample rate of the signal (in Hz).
-    
+
     Raises:
     ValueError: If order is not a positive integer or if cutoff values are not positive.
-    
+
     Example:
     --------
     >>> plot_bandpass_filter_opt_coefficients(4, 100, 300, 1000)
@@ -244,10 +244,10 @@ def plot_bandpass_iir_filter_coefficients(order: int, low_cutoff: float, high_cu
     high_cutoff (float): The high cutoff frequency of the filter (in Hz).
     order (int): The order of the filter.
     fs (int): The sample rate of the signal (in Hz).
-    
+
     Raises:
     ValueError: If order is not a positive integer or if cutoff values are not positive.
-    
+
     Example:
     --------
     >>> plot_bandpass_filter_manual_coefficients(1000, 100, 500, 8000)
